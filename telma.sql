@@ -1,6 +1,6 @@
-/*==============================================================*/
+﻿/*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     02/03/2017 10:06:10                          */
+/* Created on:     03/03/2017 11:50:26                          */
 /*==============================================================*/
 
 
@@ -8,11 +8,11 @@ drop index SOLDE_CARTE_FK;
 
 drop index CARTE_CREDIT_PK;
 
-drop table CARTE_CREDIT;
+drop table CARTE_CREDIT CASCADE;
 
 drop index FORFAIT_PK;
 
-drop table FORFAIT;
+drop table FORFAIT CASCADE;
 
 drop index FORFAIT_TYPE2_FK;
 
@@ -20,11 +20,11 @@ drop index FORFAIT_TYPE_FK;
 
 drop index FORFAIT_TYPE_PK;
 
-drop table FORFAIT_TYPE;
+drop table FORFAIT_TYPE CASCADE;
 
 drop index SIM_PK;
 
-drop table SIM;
+drop table SIM CASCADE;
 
 drop index SIM_UTILISATEUR2_FK;
 
@@ -32,7 +32,9 @@ drop index SIM_UTILISATEUR_FK;
 
 drop index SIM_UTILISATEUR_PK;
 
-drop table SIM_UTILISATEUR;
+drop table SIM_UTILISATEUR CASCADE;
+
+drop index TRANSACTION_TYPE_FK;
 
 drop index SOLDE_SIM_FK;
 
@@ -40,21 +42,13 @@ drop index TRANSACTION_PK;
 
 drop table TRANSACTION;
 
-drop index TRANSACTION_TYPE2_FK;
-
-drop index TRANSACTION_TYPE_FK;
-
-drop index TRANSACTION_TYPE_PK;
-
-drop table TRANSACTION_TYPE;
-
 drop index TYPE_CARTE_PK;
 
-drop table TYPE_CARTE;
+drop table TYPE_CARTE CASCADE;
 
 drop index TYPE_FORFAIT_PK;
 
-drop table TYPE_FORFAIT;
+drop table TYPE_FORFAIT CASCADE;
 
 drop index TYPE_TRANSACTION_PK;
 
@@ -62,7 +56,7 @@ drop table TYPE_TRANSACTION;
 
 drop index UTILISATEUR_PK;
 
-drop table UTILISATEUR;
+drop table UTILISATEUR CASCADE;
 
 /*==============================================================*/
 /* Table: CARTE_CREDIT                                          */
@@ -71,6 +65,7 @@ create table CARTE_CREDIT (
    IDCARTE_CREDIT       SERIAL               not null,
    IDTYPE_CARTE         INT4                 not null,
    CODE_CREDIT          CHAR(15)             not null,
+   DATE_PEREMPTION      DATE                 not null,
    constraint PK_CARTE_CREDIT primary key (IDCARTE_CREDIT)
 );
 
@@ -110,6 +105,7 @@ IDFORFAIT
 create table FORFAIT_TYPE (
    IDFORFAIT            INT4                 not null,
    IDTYPE_FORFAIT       INT4                 not null,
+   QUANTITE_OFFRE       INT4                 not null,
    constraint PK_FORFAIT_TYPE primary key (IDFORFAIT, IDTYPE_FORFAIT)
 );
 
@@ -190,6 +186,7 @@ IDSIM
 create table TRANSACTION (
    IDTRANSACTION        SERIAL               not null,
    IDSIM                INT4                 not null,
+   IDTYPE_TRANSACTION   INT4                 not null,
    SOLDE                DECIMAL              not null,
    TIME_TRANSACTION     DATE                 not null,
    constraint PK_TRANSACTION primary key (IDTRANSACTION)
@@ -210,33 +207,9 @@ IDSIM
 );
 
 /*==============================================================*/
-/* Table: TRANSACTION_TYPE                                      */
-/*==============================================================*/
-create table TRANSACTION_TYPE (
-   IDTRANSACTION        INT4                 not null,
-   IDTYPE_TRANSACTION   INT4                 not null,
-   constraint PK_TRANSACTION_TYPE primary key (IDTRANSACTION, IDTYPE_TRANSACTION)
-);
-
-/*==============================================================*/
-/* Index: TRANSACTION_TYPE_PK                                   */
-/*==============================================================*/
-create unique index TRANSACTION_TYPE_PK on TRANSACTION_TYPE (
-IDTRANSACTION,
-IDTYPE_TRANSACTION
-);
-
-/*==============================================================*/
 /* Index: TRANSACTION_TYPE_FK                                   */
 /*==============================================================*/
-create  index TRANSACTION_TYPE_FK on TRANSACTION_TYPE (
-IDTRANSACTION
-);
-
-/*==============================================================*/
-/* Index: TRANSACTION_TYPE2_FK                                  */
-/*==============================================================*/
-create  index TRANSACTION_TYPE2_FK on TRANSACTION_TYPE (
+create  index TRANSACTION_TYPE_FK on TRANSACTION (
 IDTYPE_TRANSACTION
 );
 
@@ -336,12 +309,7 @@ alter table TRANSACTION
       references SIM (IDSIM)
       on delete restrict on update restrict;
 
-alter table TRANSACTION_TYPE
-   add constraint FK_TRANSACT_TRANSACTI_TRANSACT foreign key (IDTRANSACTION)
-      references TRANSACTION (IDTRANSACTION)
-      on delete restrict on update restrict;
-
-alter table TRANSACTION_TYPE
+alter table TRANSACTION
    add constraint FK_TRANSACT_TRANSACTI_TYPE_TRA foreign key (IDTYPE_TRANSACTION)
       references TYPE_TRANSACTION (IDTYPE_TRANSACTION)
       on delete restrict on update restrict;

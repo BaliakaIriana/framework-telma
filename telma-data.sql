@@ -140,6 +140,8 @@ SELECT pg_catalog.setval('transaction_idtransaction_seq', 1, false);
 --
 
 INSERT INTO type_transaction VALUES (1, 'recharge');
+INSERT INTO type_transaction VALUES (2, 'virement');
+INSERT INTO type_transaction VALUES (3, 'depense');
 
 
 --
@@ -174,7 +176,7 @@ SELECT pg_catalog.setval('type_forfait_idtype_forfait_seq', 3, true);
 -- Name: type_transaction_idtype_transaction_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('type_transaction_idtype_transaction_seq', 1, true);
+SELECT pg_catalog.setval('type_transaction_idtype_transaction_seq', 3, true);
 
 
 --
