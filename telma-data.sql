@@ -20,6 +20,12 @@ truncate type_transaction cascade;
 truncate type_carte cascade;
 truncate forfait cascade ;
 truncate type_forfait cascade ;
+truncate utilisateur cascade ;
+truncate type_transaction cascade ;
+truncate sim cascade ;
+truncate forfait_type cascade ;
+truncate transactions cascade ;
+truncate transaction_type cascade ;
 
 --
 -- TOC entry 2115 (class 0 OID 26647)
