@@ -1,4 +1,4 @@
---
+﻿--
 -- PostgreSQL database dump
 --
 
@@ -14,6 +14,12 @@ SET check_function_bodies = false;
 SET client_min_messages = warning;
 
 SET search_path = public, pg_catalog;
+
+truncate carte_credit cascade;
+truncate type_transaction cascade;
+truncate type_carte cascade;
+truncate forfait cascade ;
+truncate type_forfait cascade ;
 
 --
 -- TOC entry 2115 (class 0 OID 26647)
