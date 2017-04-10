@@ -3,7 +3,7 @@ package local.baledo.root.s6.operateur.model;
 public class Data {
 	protected int id;
 
-	
+	public Data(){}
 	public Data(int id) {
 		super();
 		this.setId(id);

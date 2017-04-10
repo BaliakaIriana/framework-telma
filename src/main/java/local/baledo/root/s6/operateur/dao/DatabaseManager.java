@@ -8,6 +8,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import local.baledo.root.s6.operateur.model.Data;
 import local.baledo.root.s6.operateur.util.Util;
@@ -114,8 +116,7 @@ public class DatabaseManager {
 	}
 	
 	private Object getValue(Data data,Field field) throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
-		Util u = new Util();
-		Method m = data.getClass().getMethod("get"+u.toUpperFirst(field.getName()));
+		Method m = data.getClass().getMethod("get"+Util.toUpperFirst(field.getName()));
 		Object o = m.invoke(data);
 		return o;
 	}
@@ -181,6 +182,91 @@ public class DatabaseManager {
 		String query = "delete from " + data.getClass().getSimpleName().toLowerCase();
 		query += " where id" + data.getClass().getSimpleName().toLowerCase() + " = ?";
 		return query;
+	}
+	
+	public List<Data> findById(Data data,boolean recursive) throws Exception{
+		Connection connection = null;
+		PreparedStatement stmt = null;
+		List<Data> ret = null;
+		try {
+			connection = UtilDao.getConnection();
+			String query = findByIdQuery(data, recursive);
+			System.out.println(query);
+			stmt = connection.prepareStatement(query);
+			ret = executeFindById(data, stmt);
+		} catch (ClassNotFoundException | SQLException e) {
+			throw e;
+		}finally{
+			if(stmt != null) stmt.close();
+			if(connection != null) connection.close();
+		}
+		return ret;
+	}
+	String findByIdQuery(Data data,boolean recursive) throws InstantiationException, IllegalAccessException, IllegalArgumentException, NoSuchMethodException, SecurityException, InvocationTargetException{
+		String query = "select * from "+data.getClass().getSimpleName().toLowerCase();
+		/**
+		 * Si l'id est renseigné (!=0) alors on ajoute le critère de recherche sur la clé primaire
+		 */
+		if(data.getId() != 0){
+			query += " where id"+data.getClass().getSimpleName().toLowerCase()+" = ?";
+		}
+		/**
+		 * De même pour les autres attributs
+		 */
+		Field[] fields = data.getClass().getDeclaredFields();
+		for(Field item : fields){
+			if(!Util.checkIfDefault(getValue(data, item))){
+				if(query.contains("where")) query += " and ";
+				else query += " where ";
+				if(getValue(data, item) instanceof String){
+					query += item.getName() + " like '%'||?||'%'";
+				}else{
+					query += item.getName() + " = ?";
+				}
+				System.out.println(item.getName()+ " " +Util.checkIfDefault(getValue(data, item)));
+			}
+			
+		}
+		return query;
+	}
+	List<Data> executeFindById(Data data,PreparedStatement stmt) throws SQLException, InstantiationException, IllegalAccessException, NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException{
+		int counter = 1;
+		if(data.getId() != 0){
+			stmt.setInt(1, data.getId());
+			counter ++;
+		}
+		Field[] field = data.getClass().getDeclaredFields();
+		
+		for(Field item : field){
+			System.out.println(item.getName()+" "+Util.checkIfDefault(getValue(data, item))+" = "+getValue(data, item));
+			if(!Util.checkIfDefault(getValue(data, item))){
+				Method methodSet = stmt.getClass().getMethod("set"+item.getType().getSimpleName(),int.class, getValue(data, item).getClass());
+				methodSet.setAccessible(true);
+				methodSet.invoke(stmt, counter, getValue(data, item));
+				counter++;
+			}
+		}
+		ResultSet res = stmt.executeQuery();
+		List<Data> list = new ArrayList<Data>();
+		while(res.next()){
+			Data temp = data.getClass().newInstance();
+			Field[] fields = temp.getClass().getDeclaredFields();
+			for(Field item : fields){
+				Method methodSet = temp.getClass().getMethod("set"+Util.toUpperFirst(item.getName()),item.getType());
+				if(item.getType().getSuperclass() == Data.class){
+					
+				}else if(item.getType().getSuperclass() == List.class){
+					
+				}else{
+					Method methodGetRes = res.getClass().getMethod("get"+item.getType().getSimpleName(), String.class);
+					Object o = methodGetRes.invoke(res, item.getName());
+					methodSet.invoke(temp, o);
+				}
+				
+			}
+			list.add(temp);
+		}
+		return list;
 	}
 }
 

@@ -9,7 +9,7 @@ public class Utilisateur extends Data{
 	Date naissance;
 //	List<CarteSim> simUtilisateur;
 	
-	
+	public Utilisateur(){}
 	
 	public Utilisateur(int idutilisateur, String nom, String prenom, String cin,Date naissance) {
 		super(idutilisateur);

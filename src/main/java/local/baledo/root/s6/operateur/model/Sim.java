@@ -7,6 +7,7 @@ public class Sim extends Data{
 	Utilisateur utilisateur;
 //	double solde;
 	
+	public Sim(){}
 	public Utilisateur getUtilisateur() {
 		return utilisateur;
 	}
@@ -52,5 +53,12 @@ public class Sim extends Data{
 //		this.solde = solde;
 //	}
 //	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Sim [numero=" + numero + ", pin=" + pin + ", puk=" + puk + ", utilisateur=" + utilisateur + "]";
+	}
 	
 }
