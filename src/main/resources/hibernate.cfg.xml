@@ -20,7 +20,7 @@
         <!-- Echo all executed SQL to stdout -->
         <property name="show_sql">true</property>
 
-        <mapping resource="mg/itu/s6fw/modele/mappings/Matiere.hbm.xml"/>
+        <!-- <mapping resource="local/baledo/root/s6/operateur/hbm/Utilisateur.hbm.xml"/> -->
 
     </session-factory>
 

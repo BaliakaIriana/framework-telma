@@ -7,7 +7,7 @@ public class Utilisateur extends Data{
 	String prenom;
 	String cin;
 	Date naissance;
-//	List<CarteSim> simUtilisateur;
+//	List<Sim> simUtilisateur;
 	
 	public Utilisateur(){}
 	
